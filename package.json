@@ -1,0 +1,30 @@
+{
+  "name": "zoey-client-node",
+  "version": "0.0.1",
+  "description": "A client library for working with the Zoey API.",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "tsc",
+    "build": "tsup src/index.ts --format cjs,esm --dts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/erlorenz/zoey-client-node.git"
+  },
+  "author": "Erik Lorenz",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^20.6.0",
+    "@types/node-fetch": "^2.6.4",
+    "tsup": "^7.2.0",
+    "typescript": "^5.2.2",
+    "vitest": "^0.34.4"
+  },
+  "dependencies": {
+    "dotenv": "^16.3.1",
+    "node-fetch": "^2.7.0"
+  }
+}
