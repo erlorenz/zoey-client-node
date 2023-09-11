@@ -16,12 +16,19 @@ class Client {
   #siteUrl: string;
 
   constructor(config: Config) {
+    this.#validateConfig(config);
     this.#auth = config.auth;
     this.#siteUrl = config.siteUrl;
   }
 
-  writeProps() {
-    console.log({ ...this.#auth, url: this.#siteUrl });
+  #validateConfig(cfg: Config) {
+    const missing: string[] = [];
+    for (let [k, v] of Object.entries(cfg)) {
+      if (!v) missing.push(k);
+    }
+
+    if (missing.length)
+      throw new Error(`empty config values: ${missing.join(", ")}`);
   }
 }
 
@@ -35,4 +42,4 @@ const config: Config = {
   },
 };
 
-new Client(config).writeProps();
+new Client(config);
