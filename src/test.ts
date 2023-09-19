@@ -1,7 +1,7 @@
-import { Client } from "./index";
+import { Zoey } from "./index";
 
 const config = {
-  siteUrl: process.env.ZOEY_SITE_URL!,
+  basePath: process.env.ZOEY_SITE_URL!,
   auth: {
     consumerKey: process.env.ZOEY_CONSUMER_KEY!,
     consumerSecret: process.env.ZOEY_CONSUMER_SECRET!,
@@ -10,4 +10,9 @@ const config = {
   },
 };
 
-new Client(config);
+const zoey = new Zoey(config);
+
+zoey.accounts
+  .list({ limit: 2, maxPages: 2 })
+  .then((d) => console.log("DATA: ", d))
+  .catch((err) => console.log(err));
