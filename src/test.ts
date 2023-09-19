@@ -14,5 +14,4 @@ const zoey = new Zoey(config);
 
 zoey.accounts
   .list({ limit: 2, maxPages: 2 })
-  .then((d) => console.log("DATA: ", d))
-  .catch((err) => console.log(err));
+  .then((d) => console.log("DATA: ", d.ok ? d.data : d.error));

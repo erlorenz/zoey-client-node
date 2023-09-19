@@ -82,7 +82,9 @@ export type MakeAndParseRequestFunction = <Tschema extends z.ZodSchema>(
   options: MakeRequestOptions & { schema: Tschema }
 ) => Promise<MakeAndParseRequestResult<z.infer<Tschema>>>;
 
-export type MakePaginatedRequestFunction = <Tschema extends z.ZodSchema>(
+export type MakePaginatedRequestFunction = <
+  Tschema extends z.ZodArray<z.ZodTypeAny>
+>(
   options: MakeRequestOptions & {
     schema: Tschema;
     limit: number;

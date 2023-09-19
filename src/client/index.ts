@@ -66,7 +66,6 @@ export class Client implements ClientWithAuth {
       },
     });
 
-    console.log(`Making request: ${JSON.stringify(request)}`);
     try {
       const res = await fetch(request);
 
@@ -96,12 +95,11 @@ export class Client implements ClientWithAuth {
         };
       }
 
+      // TODO: remove unknown when @types/node has fetch in it
       const data: unknown = await res.json();
       return { ok: true, data };
     } catch (err) {
       if (err instanceof Error) {
-        console.log(err.message);
-
         return {
           ok: false,
           error: new ZoeyError({
@@ -164,7 +162,7 @@ export class Client implements ClientWithAuth {
 
   async makePaginatedRequest(
     opts: MakeRequestOptions & {
-      schema: z.ZodSchema;
+      schema: z.ZodArray<z.ZodTypeAny>;
       limit: number;
       maxPages?: number;
     }
@@ -175,7 +173,7 @@ export class Client implements ClientWithAuth {
     let more = true;
     let page = 1;
 
-    const list: z.infer<typeof opts.schema>[] = [];
+    const list: z.infer<typeof opts.schema> = [];
 
     while (more) {
       queryParams.page = page.toString();

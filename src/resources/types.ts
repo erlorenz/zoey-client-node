@@ -5,6 +5,6 @@ export const accountSchema = z.object({
   name: z.string(),
 });
 
-export type Account = z.infer<typeof accountSchema>;
-
 export const accountListSchema = z.array(accountSchema);
+
+export type Account = z.infer<typeof accountSchema>;

@@ -21,13 +21,8 @@ export class AccountsResource {
       schema: accountListSchema,
       maxPages,
     });
-    if (!result.ok) {
-      throw new Error(
-        `error code ${result.error.code}: ${result.error.message}`
-      );
-    }
 
-    return result.data;
+    return result;
   }
 
   async retrieve(id: number) {
@@ -39,12 +34,6 @@ export class AccountsResource {
       schema: accountSchema,
     });
 
-    if (!result.ok) {
-      throw new Error(
-        `error code ${result.error.code}: ${JSON.stringify(result.error)}`
-      );
-    }
-
-    return result.data;
+    return result;
   }
 }
