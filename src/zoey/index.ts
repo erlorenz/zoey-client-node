@@ -1,15 +1,15 @@
-import { Client } from "../client";
-import { ClientWithAuth, Config } from "../client/types";
-import { AccountsResource } from "../resources/accounts";
+import { Client } from "../http-client";
+import { HttpClient, Config } from "../http-client/types";
+import { AccountsService } from "../services/accounts";
 
-export class Zoey {
-  client: ClientWithAuth;
-  accounts: AccountsResource;
+export class ZoeyClient {
+  readonly client: HttpClient;
+  readonly accounts: AccountsService;
   // orders: OrdersResource;
 
   constructor(config: Config) {
     this.client = new Client(config);
-    this.accounts = new AccountsResource(this.client);
+    this.accounts = new AccountsService(this.client);
     // this.orders = new OrdersResource(this.client)
   }
 }

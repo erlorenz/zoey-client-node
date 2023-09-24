@@ -1,19 +1,20 @@
 import { z } from "zod";
 import {
-  ClientWithAuth,
-  ErrorType,
+  HttpClient,
   MakeAndParseRequestResult,
   MakeRequestOptions,
   MakeRequestResult,
-  ZoeyError,
   zoeyErrorSchema,
+  Config,
+  HttpMethod,
 } from "./types";
-import { Config } from "../../dist";
 import OAuth from "oauth-1.0a";
 import { createOAuth } from "./oauth";
 import fetch, { Request } from "node-fetch";
+import { ErrorType, ZoeyError } from "../errors/zoey-error";
+import { ApiError, apiErrorResponseSchema } from "../errors/api";
 
-export class Client implements ClientWithAuth {
+export class Client implements HttpClient {
   #config: Config;
   #basePath: string;
   #oauth: OAuth;
@@ -42,9 +43,8 @@ export class Client implements ClientWithAuth {
     const url = new URL(this.#basePath + "/api/rest" + opts.path);
 
     if (opts.queryParams) {
-      for (let [k, v] of Object.entries(opts.queryParams)) {
-        url.searchParams.append(k, v);
-      }
+      const paramsString = new URLSearchParams(opts.queryParams).toString();
+      url.search = paramsString;
     }
 
     const authHeader = this.#oauth.toHeader(
@@ -68,42 +68,59 @@ export class Client implements ClientWithAuth {
 
     try {
       const res = await fetch(request);
+      let json: unknown;
 
-      if (!res.ok) {
-        let errorMessage: string;
-        let errorType: ErrorType;
-
-        const data = await res.json();
-        const parsed = zoeyErrorSchema.safeParse(data);
-
-        if (!parsed.success) {
-          errorMessage = "error: " + JSON.stringify(data);
-          errorType = "unknown";
-        } else {
-          errorMessage = parsed.data.messages.error[0].message;
-          errorType = "api";
-        }
-
+      try {
+        json = await res.json();
+      } catch (err) {
         return {
           ok: false,
           error: new ZoeyError({
-            code: res.status,
-            message: errorMessage,
             path: request.url,
-            type: errorType,
+            message: `Server responded with status ${res.status} but could not parse JSON.`,
+            type: "unknown",
+          }),
+        };
+      }
+
+      if (!res.ok) {
+        const parsed = apiErrorResponseSchema.safeParse(json);
+
+        if (parsed.success) {
+          return {
+            ok: false,
+            error: new ApiError({
+              statusCode: res.status,
+              path: request.url,
+              message:
+                "Zoey API error: " + parsed.data.messages.error[0].message,
+              errors: parsed.data.messages.error,
+            }),
+          };
+        }
+
+        const unknownJson = JSON.stringify(parsed.error);
+
+        return {
+          ok: false,
+          error: new ApiError({
+            statusCode: res.status,
+            path: request.url,
+            message:
+              "Zoey API returned error response but format was not correct: " +
+              unknownJson,
+            errors: [{ message: unknownJson, code: 0 }],
           }),
         };
       }
 
       // TODO: remove unknown when @types/node has fetch in it
-      const data: unknown = await res.json();
-      return { ok: true, data };
+      return { ok: true, data: json };
     } catch (err) {
       if (err instanceof Error) {
         return {
           ok: false,
           error: new ZoeyError({
-            code: 500,
             message: err.message,
             path: request.url,
             type: "network",
@@ -115,7 +132,6 @@ export class Client implements ClientWithAuth {
       return {
         ok: false,
         error: new ZoeyError({
-          code: 500,
           message: "error: " + JSON.stringify(err),
           path: request.url,
           type: "unknown",
@@ -145,7 +161,6 @@ export class Client implements ClientWithAuth {
       return {
         ok: false,
         error: new ZoeyError({
-          code: 500,
           message: JSON.stringify(parseResult.error.flatten),
           path: opts.path,
           type: "invalid_return_type",

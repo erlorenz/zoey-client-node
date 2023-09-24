@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { QueryParams } from "../zoey/types";
+import { ZoeyError } from "../errors/zoey-error";
 
 export type HttpMethod = "GET" | "PATCH" | "POST" | "PUT" | "DELETE";
 
@@ -18,6 +19,7 @@ export type Config = {
     tokenSecret: string;
   };
   basePath: string;
+  timeout?: string;
 };
 
 export const zoeyErrorSchema = z.object({
@@ -26,34 +28,7 @@ export const zoeyErrorSchema = z.object({
   }),
 });
 
-export type ErrorType = "api" | "network" | "unknown" | "invalid_return_type";
-
-export class ZoeyError extends Error {
-  code: number;
-  path: string;
-  type: ErrorType;
-
-  constructor({
-    code,
-    message,
-    path,
-    type,
-    cause,
-  }: {
-    code: number;
-    message: string;
-    path: string;
-    type: ErrorType;
-    cause?: Error;
-  }) {
-    super(message, { cause });
-    this.code = code;
-    this.path = path;
-    this.type = type;
-  }
-}
-
-export type ClientWithAuth = {
+export type HttpClient = {
   makeRequest: MakeRequestFunction;
   makeAndParseRequest: MakeAndParseRequestFunction;
   makePaginatedRequest: MakePaginatedRequestFunction;
