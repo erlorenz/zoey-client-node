@@ -8,5 +8,3 @@ export const accountSchema = z.object({
 export const accountListSchema = z.array(accountSchema);
 
 export type Account = z.infer<typeof accountSchema>;
-
-export type AccountId = string;

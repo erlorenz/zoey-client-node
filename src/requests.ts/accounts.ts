@@ -1,4 +1,4 @@
-import { ZoeyBooleanNumber, ZoeyResourceId } from "../zoey/types";
+import { ZoeyBooleanNumber, ZoeyResourceId } from "../zoey/types.js";
 
 export type CreateAccountRequestBody = {
   companyData: {

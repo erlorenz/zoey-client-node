@@ -1,12 +1,8 @@
 import { z } from "zod";
-import { HttpClient } from "../http-client/types";
-import { ListOptions, QueryParams, ZoeyResourceId } from "../zoey/types";
-import {
-  AccountId,
-  accountListSchema,
-  accountSchema,
-} from "../models/accounts";
-import { CreateAccountRequestBody } from "../requests.ts/accounts";
+import { HttpClient } from "../http-client/types.js";
+import { ListOptions, ZoeyResourceId } from "../zoey/types.js";
+import { accountListSchema, accountSchema } from "../models/accounts.js";
+import { CreateAccountRequestBody } from "../requests.ts/accounts.js";
 
 export class AccountsService {
   #client: HttpClient;

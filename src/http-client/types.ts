@@ -1,6 +1,7 @@
 import { z } from "zod";
-import { QueryParams } from "../zoey/types";
-import { ZoeyError } from "../errors/zoey-error";
+import { QueryParams } from "../zoey/types.js";
+import { ZoeyError } from "../errors/zoey-error.js";
+import { ApiError } from "../index.js";
 
 export type HttpMethod = "GET" | "PATCH" | "POST" | "PUT" | "DELETE";
 
@@ -43,19 +44,19 @@ export type MakeRequestOptions = {
 
 export type MakeRequestResult =
   | { ok: true; data: unknown }
-  | { ok: false; error: ZoeyError };
+  | { ok: false; error: ZoeyError | ApiError };
 
 export type MakeAndParseRequestResult<Tdata> =
   | { ok: true; data: Tdata }
-  | { ok: false; error: ZoeyError };
+  | { ok: false; error: ZoeyError | ApiError };
 
 export type MakeRequestFunction = (
   options: MakeRequestOptions
-) => Promise<MakeRequestResult>;
+) => Promise<Result<unknown, ZoeyError | ApiError>>;
 
 export type MakeAndParseRequestFunction = <Tschema extends z.ZodSchema>(
   options: MakeRequestOptions & { schema: Tschema }
-) => Promise<MakeAndParseRequestResult<z.infer<Tschema>>>;
+) => Promise<Result<z.infer<Tschema>, ZoeyError | ApiError>>;
 
 export type MakePaginatedRequestFunction = <
   Tschema extends z.ZodArray<z.ZodTypeAny>
@@ -65,4 +66,14 @@ export type MakePaginatedRequestFunction = <
     limit: number;
     maxPages?: number;
   }
-) => Promise<MakeAndParseRequestResult<z.infer<Tschema>>>;
+) => ReturnType<MakeAndParseRequestFunction>;
+
+type Result<T, E extends Error> =
+  | {
+      ok: true;
+      data: T;
+    }
+  | {
+      ok: false;
+      error: E;
+    };

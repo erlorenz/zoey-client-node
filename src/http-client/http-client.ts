@@ -4,15 +4,13 @@ import {
   MakeAndParseRequestResult,
   MakeRequestOptions,
   MakeRequestResult,
-  zoeyErrorSchema,
   Config,
-  HttpMethod,
-} from "./types";
+} from "./types.js";
 import OAuth from "oauth-1.0a";
-import { createOAuth } from "./oauth";
+import { createOAuth } from "./oauth.js";
 import fetch, { Request } from "node-fetch";
-import { ErrorType, ZoeyError } from "../errors/zoey-error";
-import { ApiError, apiErrorResponseSchema } from "../errors/api";
+import { ZoeyError } from "../errors/zoey-error.js";
+import { ApiError, apiErrorResponseSchema } from "../errors/api-error.js";
 
 export class Client implements HttpClient {
   #config: Config;
@@ -31,12 +29,12 @@ export class Client implements HttpClient {
 
   #validateConfig(cfg: Config) {
     const missing: string[] = [];
-    for (let [k, v] of Object.entries(cfg)) {
+    for (const [k, v] of Object.entries(cfg)) {
       if (!v) missing.push(k);
     }
 
     if (missing.length)
-      throw new Error(`empty config values: ${missing.join(", ")}`);
+      throw new Error(`Empty Zoey config values: ${missing.join(", ")}`);
   }
 
   async makeRequest(opts: MakeRequestOptions): Promise<MakeRequestResult> {
@@ -94,7 +92,7 @@ export class Client implements HttpClient {
               path: request.url,
               message:
                 "Zoey API error: " + parsed.data.messages.error[0].message,
-              errors: parsed.data.messages.error,
+              responseBody: parsed.data,
             }),
           };
         }
@@ -103,13 +101,10 @@ export class Client implements HttpClient {
 
         return {
           ok: false,
-          error: new ApiError({
-            statusCode: res.status,
+          error: new ZoeyError({
             path: request.url,
-            message:
-              "Zoey API returned error response but format was not correct: " +
-              unknownJson,
-            errors: [{ message: unknownJson, code: 0 }],
+            message: `Zoey API returned error response with status ${res.status} but format was not correct: ${unknownJson}`,
+            type: "invalid_return_type",
           }),
         };
       }

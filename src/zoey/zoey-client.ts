@@ -1,6 +1,6 @@
-import { Client } from "../http-client";
-import { HttpClient, Config } from "../http-client/types";
-import { AccountsService } from "../services/accounts";
+import { Client } from "../http-client/http-client.js";
+import { HttpClient, Config } from "../http-client/types.js";
+import { AccountsService } from "../services/accounts.js";
 
 export class ZoeyClient {
   readonly client: HttpClient;

@@ -1,24 +1,24 @@
 import { z } from "zod";
-import { ZoeyError } from "./zoey-error";
+import { ZoeyError } from "./zoey-error.js";
 
 export class ApiError extends ZoeyError {
   statusCode: number;
-  errors?: ApiErrorList;
+  responseBody?: ApiErrorResponse;
 
   constructor({
     statusCode,
     message,
-    errors,
+    responseBody,
     path,
   }: {
     statusCode: number;
     message: string;
-    errors?: ApiErrorList;
+    responseBody?: ApiErrorResponse;
     path: string;
   }) {
     super({ type: "api", message, path });
     this.statusCode = statusCode;
-    this.errors = errors;
+    this.responseBody = responseBody;
   }
 }
 
@@ -29,4 +29,3 @@ export const apiErrorResponseSchema = z.object({
 });
 
 export type ApiErrorResponse = z.infer<typeof apiErrorResponseSchema>;
-type ApiErrorList = ApiErrorResponse["messages"]["error"];

@@ -1,4 +1,6 @@
-import { Zoey } from "./index";
+import { ZoeyClient } from "./index.js";
+import dotenv from "dotenv";
+dotenv.config();
 
 const config = {
   basePath: process.env.ZOEY_SITE_URL!,
@@ -10,7 +12,7 @@ const config = {
   },
 };
 
-const zoey = new Zoey(config);
+const zoey = new ZoeyClient(config);
 
 zoey.accounts
   .list({ limit: 2, maxPages: 2 })

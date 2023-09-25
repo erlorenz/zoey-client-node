@@ -9,3 +9,9 @@
 
 - Remove node-fetch when @types/node finally adds native fetch
 - Add instructions
+
+## Basic Usage
+
+Returns a `Result<Data,ZoeyError | ApiError>`
+
+## Errors
