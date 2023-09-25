@@ -2,16 +2,16 @@
 
 ## Requirements
 
-- Node 18+
-- Currently works as CommonJS or ESM, in future only ESM
+- Node 18+ (uses native Fetch API)
+- Built as both CommonJS and ESM
 
 ## Todo:
 
-- Remove node-fetch when @types/node finally adds native fetch
+- Remove node-fetch when @types/node finally adds native Fetch types
 - Add instructions
 
 ## Basic Usage
 
-Returns a `Result<Data,ZoeyError | ApiError>`
+Returns a `Result<Data, ZoeyError>`
 
 ## Errors
