@@ -12,17 +12,6 @@ export type JSONValue =
   | { [x: string]: JSONValue }
   | Array<JSONValue>;
 
-export type Config = {
-  auth: {
-    consumerKey: string;
-    consumerSecret: string;
-    accessToken: string;
-    tokenSecret: string;
-  };
-  basePath: string;
-  timeout?: string;
-};
-
 export const zoeyErrorSchema = z.object({
   messages: z.object({
     error: z.array(z.object({ code: z.number(), message: z.string() })),

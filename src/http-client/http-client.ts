@@ -4,41 +4,32 @@ import {
   MakeAndParseRequestResult,
   MakeRequestOptions,
   MakeRequestResult,
-  Config,
 } from "./types.js";
 import OAuth from "oauth-1.0a";
 import { createOAuth } from "./oauth.js";
 import fetch, { Request } from "node-fetch";
 import { ZoeyError } from "../errors/zoey-error.js";
 import { ApiError, apiErrorResponseSchema } from "../errors/api-error.js";
+import { ZoeyClientConfig } from "../zoey/types.js";
 
 export class Client implements HttpClient {
-  #config: Config;
-  #basePath: string;
+  #auth: ZoeyClientConfig["auth"];
+  #timeout: number;
+  #baseUrl: string;
   #oauth: OAuth;
 
-  constructor(config: Config) {
-    this.#validateConfig(config);
-    this.#config = config;
-    this.#basePath = config.basePath;
+  constructor(config: ZoeyClientConfig) {
+    this.#auth = config.auth;
+    this.#timeout = config.timeout || 15000;
+    this.#baseUrl = config.baseUrl;
     this.#oauth = createOAuth(
       config.auth.consumerKey,
       config.auth.consumerSecret
     );
   }
 
-  #validateConfig(cfg: Config) {
-    const missing: string[] = [];
-    for (const [k, v] of Object.entries(cfg)) {
-      if (!v) missing.push(k);
-    }
-
-    if (missing.length)
-      throw new Error(`Empty Zoey config values: ${missing.join(", ")}`);
-  }
-
   async makeRequest(opts: MakeRequestOptions): Promise<MakeRequestResult> {
-    const url = new URL(this.#basePath + "/api/rest" + opts.path);
+    const url = new URL(this.#baseUrl + "/api/rest" + opts.path);
 
     if (opts.queryParams) {
       const paramsString = new URLSearchParams(opts.queryParams).toString();
@@ -49,8 +40,8 @@ export class Client implements HttpClient {
       this.#oauth.authorize(
         { url: url.toString(), method: opts.method ?? "GET", data: null },
         {
-          key: this.#config.auth.accessToken,
-          secret: this.#config.auth.tokenSecret,
+          key: this.#auth.accessToken,
+          secret: this.#auth.tokenSecret,
         }
       )
     );

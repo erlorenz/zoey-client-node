@@ -1,4 +1,9 @@
-export type ErrorType = "api" | "network" | "unknown" | "invalid_return_type";
+export type ErrorType =
+  | "api"
+  | "network"
+  | "unknown"
+  | "invalid_return_type"
+  | "config";
 
 export class ZoeyError extends Error {
   path: string;
