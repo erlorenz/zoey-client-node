@@ -1,6 +1,6 @@
 import { Client } from "../http-client/http-client.js";
 import { HttpClient } from "../http-client/types.js";
-import { ZoeyError } from "../errors/errors.js";
+import { ConfigurationError } from "../errors/errors.js";
 import { AccountsService } from "../services/accounts.js";
 import { ZoeyClientConfig, zoeyClientConfigSchema } from "./types.js";
 
@@ -21,11 +21,6 @@ export class ZoeyClient {
     if (parsed.success) {
       return parsed.data;
     }
-    throw new ZoeyError({
-      type: "config",
-      message: "Config not valid: " + parsed.error.errors[0].message,
-      cause: parsed.error,
-      path: "",
-    });
+    throw new ConfigurationError(parsed.error.errors[0].message);
   }
 }

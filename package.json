@@ -11,6 +11,7 @@
   "scripts": {
     "test": "vitest run",
     "test:dev": "vitest",
+    "test-node": "node --test --trace-warnings --env-file .env --loader tsx/esm test/node/*.ts",
     "lint": "tsc --noemit",
     "coverage": "vitest run --coverage",
     "build": "npm run lint && tsup src/index.ts --format cjs,esm --dts"
@@ -26,7 +27,6 @@
     "@types/node-fetch": "^2.6.4",
     "@typescript-eslint/eslint-plugin": "^6.7.2",
     "@typescript-eslint/parser": "^6.7.2",
-    "dotenv": "^16.3.1",
     "eslint": "^8.50.0",
     "tsup": "^7.2.0",
     "tsx": "^3.13.0",

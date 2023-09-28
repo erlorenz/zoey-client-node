@@ -9,8 +9,14 @@ import OAuth from "oauth-1.0a";
 import { createOAuth } from "./oauth.js";
 import fetch, { Request } from "node-fetch";
 import { ZoeyError } from "../errors/zoey-error.js";
-import { ApiError, apiErrorResponseSchema } from "../errors/api-error.js";
 import { ZoeyClientConfig } from "../zoey/types.js";
+import { generateApiError } from "../errors/generate-api-error.js";
+import {
+  ConnectionError,
+  InvalidReturnTypeError,
+  UnknownError,
+} from "../index.js";
+import { buildRequest } from "./build-request.js";
 
 export class Client implements HttpClient {
   #auth: ZoeyClientConfig["auth"];
@@ -20,7 +26,7 @@ export class Client implements HttpClient {
 
   constructor(config: ZoeyClientConfig) {
     this.#auth = config.auth;
-    this.#timeout = config.timeout || 15000;
+    this.#timeout = config.timeout || 15_000;
     this.#baseUrl = config.baseUrl;
     this.#oauth = createOAuth(
       config.auth.consumerKey,
@@ -29,30 +35,12 @@ export class Client implements HttpClient {
   }
 
   async makeRequest(opts: MakeRequestOptions): Promise<MakeRequestResult> {
-    const url = new URL(this.#baseUrl + "/api/rest" + opts.path);
-
-    if (opts.queryParams) {
-      const paramsString = new URLSearchParams(opts.queryParams).toString();
-      url.search = paramsString;
-    }
-
-    const authHeader = this.#oauth.toHeader(
-      this.#oauth.authorize(
-        { url: url.toString(), method: opts.method ?? "GET", data: null },
-        {
-          key: this.#auth.accessToken,
-          secret: this.#auth.tokenSecret,
-        }
-      )
-    );
-
-    const request = new Request(url.toString(), {
-      method: opts.method ?? "GET",
-      body: opts.body ? JSON.stringify(opts.body) : undefined,
-      headers: {
-        "Content-Type": "application/json",
-        ...authHeader,
-      },
+    const request = buildRequest({
+      opts: opts,
+      baseUrl: this.#baseUrl,
+      oauth: this.#oauth,
+      auth: this.#auth,
+      timeout: this.#timeout,
     });
 
     try {
@@ -73,30 +61,10 @@ export class Client implements HttpClient {
       }
 
       if (!res.ok) {
-        const parsed = apiErrorResponseSchema.safeParse(json);
-
-        if (parsed.success) {
-          return {
-            ok: false,
-            error: new ApiError({
-              statusCode: res.status,
-              path: request.url,
-              message:
-                "Zoey API error: " + parsed.data.messages.error[0].message,
-              responseBody: parsed.data,
-            }),
-          };
-        }
-
-        const unknownJson = JSON.stringify(parsed.error);
-
+        const error = await generateApiError(request.url, res);
         return {
           ok: false,
-          error: new ZoeyError({
-            path: request.url,
-            message: `Zoey API returned error response with status ${res.status} but format was not correct: ${unknownJson}`,
-            type: "invalid_return_type",
-          }),
+          error,
         };
       }
 
@@ -106,21 +74,16 @@ export class Client implements HttpClient {
       if (err instanceof Error) {
         return {
           ok: false,
-          error: new ZoeyError({
-            message: err.message,
-            path: request.url,
-            type: "network",
-            cause: err,
-          }),
+          error: new ConnectionError(err.message, request.url, err),
         };
       }
 
       return {
         ok: false,
-        error: new ZoeyError({
-          message: "error: " + JSON.stringify(err),
+        error: new UnknownError({
+          message: "Not instance of Error in catch: " + JSON.stringify(err),
           path: request.url,
-          type: "unknown",
+          cause: new Error(JSON.stringify(err)),
         }),
       };
     }
@@ -146,11 +109,11 @@ export class Client implements HttpClient {
     if (!parseResult.success) {
       return {
         ok: false,
-        error: new ZoeyError({
+        error: new InvalidReturnTypeError({
           message: JSON.stringify(parseResult.error.flatten),
           path: opts.path,
-          type: "invalid_return_type",
-          cause: parseResult.error,
+          responseBody: result.data,
+          statusCode: 200,
         }),
       };
     }

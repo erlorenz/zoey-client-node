@@ -1,7 +1,7 @@
-import { ZoeyClientConfig } from "../http-client/types.js";
+import { ZoeyClientConfig } from "../src/index.js";
 
 export const testConfig: ZoeyClientConfig = {
-  basePath: process.env.SITE_URL!,
+  baseUrl: process.env.SITE_URL!,
   auth: {
     consumerKey: process.env.CONSUMER_KEY!,
     consumerSecret: process.env.CONSUMER_SECRET!,
@@ -9,3 +9,5 @@ export const testConfig: ZoeyClientConfig = {
     tokenSecret: process.env.TOKEN_SECRET!,
   },
 };
+
+console.log(testConfig);

@@ -1,27 +1,42 @@
 export type ErrorType =
-  | "api"
-  | "network"
+  | "bad_request"
+  | "api_error"
+  | "not_found"
+  | "authentication"
+  | "permission"
+  | "connection"
   | "unknown"
   | "invalid_return_type"
-  | "config";
+  | "bad_json"
+  | "too_many_requests"
+  | "configuration";
 
 export class ZoeyError extends Error {
-  path: string;
+  path?: string;
   type: ErrorType;
+  statusCode?: number;
+  responseBody?: unknown;
 
   constructor({
     type,
     message,
     path,
     cause,
+    statusCode,
+    responseBody,
   }: {
     type: ErrorType;
     message: string;
-    path: string;
+    path?: string;
     cause?: Error;
+    statusCode?: number;
+    responseBody?: unknown;
   }) {
     super(message, { cause });
+    this.name = this.constructor.name;
     this.type = type;
     this.path = path;
+    this.statusCode = statusCode;
+    this.responseBody = responseBody;
   }
 }
