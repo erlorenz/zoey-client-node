@@ -1,6 +1,6 @@
 import { Client } from "../http-client/http-client.js";
 import { HttpClient } from "../http-client/types.js";
-import { ConfigurationError } from "../errors/errors.js";
+import { ZoeyError } from "../errors/zoey-error.js";
 import { AccountsService } from "../resources/accounts/accounts-service.js";
 import { z } from "zod";
 
@@ -22,7 +22,10 @@ export class ZoeyClient {
       return parsed.data;
     }
     const paths = parsed.error.errors.map((e) => e.path.join("."));
-    throw new ConfigurationError("Invalid config: [" + paths.join(", ") + "]");
+    throw new ZoeyError({
+      type: "configuration",
+      message: "Invalid config: [" + paths.join(", ") + "]",
+    });
   }
 }
 

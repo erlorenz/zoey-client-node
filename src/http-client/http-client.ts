@@ -7,14 +7,9 @@ import {
 } from "./types.js";
 import OAuth from "oauth-1.0a";
 import { createOAuth } from "./oauth.js";
-import fetch, { Request } from "node-fetch";
+import fetch from "node-fetch";
 import { ZoeyError } from "../errors/zoey-error.js";
 import { generateApiError } from "../errors/generate-api-error.js";
-import {
-  ConnectionError,
-  InvalidReturnTypeError,
-  UnknownError,
-} from "../errors/errors.js";
 import { buildRequest } from "./build-request.js";
 import { ZoeyClientConfig } from "../index.js";
 
@@ -45,10 +40,18 @@ export class Client implements HttpClient {
 
     try {
       const res = await fetch(request);
-      let json: unknown;
+
+      if (!res.ok) {
+        const error = await generateApiError(request.url, res);
+        return {
+          ok: false,
+          error,
+        };
+      }
 
       try {
-        json = await res.json();
+        const json = await res.json();
+        return { ok: true, data: json };
       } catch (err) {
         return {
           ok: false,
@@ -60,27 +63,24 @@ export class Client implements HttpClient {
         };
       }
 
-      if (!res.ok) {
-        const error = await generateApiError(request.url, res);
-        return {
-          ok: false,
-          error,
-        };
-      }
-
       // TODO: remove unknown when @types/node has fetch in it
-      return { ok: true, data: json };
     } catch (err) {
       if (err instanceof Error) {
         return {
           ok: false,
-          error: new ConnectionError(err.message, request.url, err),
+          error: new ZoeyError({
+            type: "connection",
+            message: err.message,
+            path: request.url,
+            cause: err,
+          }),
         };
       }
 
       return {
         ok: false,
-        error: new UnknownError({
+        error: new ZoeyError({
+          type: "unknown",
           message: "Not instance of Error in catch: " + JSON.stringify(err),
           path: request.url,
           cause: new Error(JSON.stringify(err)),
@@ -109,8 +109,9 @@ export class Client implements HttpClient {
     if (!parseResult.success) {
       return {
         ok: false,
-        error: new InvalidReturnTypeError({
-          message: JSON.stringify(parseResult.error.flatten),
+        error: new ZoeyError({
+          type: "invalid_return_type",
+          message: parseResult.error.message,
           path: opts.path,
           responseBody: result.data,
           statusCode: 200,
