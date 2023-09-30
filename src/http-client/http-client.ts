@@ -49,6 +49,10 @@ export class Client implements HttpClient {
         };
       }
 
+      if (res.status === 204) {
+        return { ok: true, data: null };
+      }
+
       try {
         const json = await res.json();
         return { ok: true, data: json };
@@ -58,7 +62,7 @@ export class Client implements HttpClient {
           error: new ZoeyError({
             path: request.url,
             message: `Server responded with status ${res.status} but could not parse JSON.`,
-            type: "unknown",
+            type: "bad_json",
           }),
         };
       }

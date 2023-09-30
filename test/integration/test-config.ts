@@ -1,6 +1,6 @@
-import { ZoeyClientConfig } from "../src/index.js";
+import { ZoeyClient, ZoeyClientConfig } from "../../src/index.js";
 
-export const testConfig: ZoeyClientConfig = {
+const testConfig: ZoeyClientConfig = {
   baseUrl: process.env.SITE_URL!,
   auth: {
     consumerKey: process.env.CONSUMER_KEY!,
@@ -10,4 +10,4 @@ export const testConfig: ZoeyClientConfig = {
   },
 };
 
-console.log(testConfig);
+export const integrationClient = new ZoeyClient(testConfig);

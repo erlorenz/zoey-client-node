@@ -74,6 +74,7 @@ Based on the type code there may be other properties like the URL path, full res
 
 ## Todo:
 
-- Finish adding all the errors
 - Remove node-fetch when @types/node finally adds native Fetch types
 - Remove vitest when node test runner improves and loader with tsx is no longer experimental and can use watch
+- Test `makePaginatedRequest`
+- Add integration tests
