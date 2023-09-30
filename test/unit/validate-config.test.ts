@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { ApiError, ConfigurationError, ZoeyClient } from "../../src/index.js";
-import type { ZoeyClientConfig } from "../../src/zoey/types.js";
+import { ZoeyClient, ZoeyClientConfig } from "../../src/index.js";
+import { ConfigurationError } from "../../src/errors/errors.js";
 
 const goodConfig: ZoeyClientConfig = {
   auth: {
@@ -34,15 +34,19 @@ const emptyParamConfig: ZoeyClientConfig = {
 
 describe("validate config", () => {
   it("should throw a ConfigurationError when param is empty", () => {
-    expect(() => new ZoeyClient(emptyParamConfig)).to.throw(ConfigurationError);
+    expect(() => ZoeyClient.validateConfig(emptyParamConfig)).to.throw(
+      ConfigurationError
+    );
   });
 
   it("should throw a ConfigurationError when param is empty TEST FAIL", () => {
-    expect(() => new ZoeyClient(emptyParamConfig)).to.throw(ConfigurationError);
+    expect(() => ZoeyClient.validateConfig(emptyParamConfig)).to.throw(
+      ConfigurationError
+    );
   });
 
   it("should throw a ConfigurationError when param is missing", () => {
-    expect(() => new ZoeyClient(missingParamConfig)).to.throw(
+    expect(() => ZoeyClient.validateConfig(missingParamConfig)).to.throw(
       ConfigurationError
     );
   });
@@ -52,12 +56,12 @@ describe("validate config", () => {
       auth: { ...missingParamConfig.auth },
       baseUrl: "hello.com",
     };
-    expect(() => new ZoeyClient(invalidbaseUrlConfig)).to.throw(
+    expect(() => ZoeyClient.validateConfig(invalidbaseUrlConfig)).to.throw(
       ConfigurationError
     );
   });
 
   it("should not throw an error when initializing with correct params", () => {
-    expect(() => new ZoeyClient(goodConfig)).not.to.throw();
+    expect(() => ZoeyClient.validateConfig(goodConfig)).not.to.throw();
   });
 });

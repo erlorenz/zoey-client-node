@@ -9,14 +9,14 @@ import OAuth from "oauth-1.0a";
 import { createOAuth } from "./oauth.js";
 import fetch, { Request } from "node-fetch";
 import { ZoeyError } from "../errors/zoey-error.js";
-import { ZoeyClientConfig } from "../zoey/types.js";
 import { generateApiError } from "../errors/generate-api-error.js";
 import {
   ConnectionError,
   InvalidReturnTypeError,
   UnknownError,
-} from "../index.js";
+} from "../errors/errors.js";
 import { buildRequest } from "./build-request.js";
+import { ZoeyClientConfig } from "../index.js";
 
 export class Client implements HttpClient {
   #auth: ZoeyClientConfig["auth"];

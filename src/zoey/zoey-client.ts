@@ -1,8 +1,8 @@
 import { Client } from "../http-client/http-client.js";
 import { HttpClient } from "../http-client/types.js";
 import { ConfigurationError } from "../errors/errors.js";
-import { AccountsService } from "../services/accounts.js";
-import { ZoeyClientConfig, zoeyClientConfigSchema } from "./types.js";
+import { AccountsService } from "../resources/accounts/accounts-service.js";
+import { z } from "zod";
 
 export class ZoeyClient {
   readonly client: HttpClient;
@@ -10,17 +10,30 @@ export class ZoeyClient {
   // orders: OrdersResource;
 
   constructor(config: ZoeyClientConfig) {
-    const validatedConfig = ZoeyClient.#validateConfig(config);
-    this.client = new Client(validatedConfig);
+    const validConfig = ZoeyClient.validateConfig(config);
+    this.client = new Client(validConfig);
     this.accounts = new AccountsService(this.client);
     // this.orders = new OrdersResource(this.client)
   }
 
-  static #validateConfig(config: ZoeyClientConfig) {
+  static validateConfig(config: ZoeyClientConfig) {
     const parsed = zoeyClientConfigSchema.safeParse(config);
     if (parsed.success) {
       return parsed.data;
     }
-    throw new ConfigurationError(parsed.error.errors[0].message);
+    throw new ConfigurationError(parsed.error.message);
   }
 }
+
+export const zoeyClientConfigSchema = z.object({
+  auth: z.object({
+    consumerKey: z.string().nonempty("consumerKey cannot be empty."),
+    consumerSecret: z.string().nonempty("consumerSecret cannot be empty."),
+    accessToken: z.string().nonempty("accessToken cannot be empty."),
+    tokenSecret: z.string().nonempty("tokenSecret cannot be empty."),
+  }),
+  baseUrl: z.string().url("baseUrl needs to be a valid url."),
+  timeout: z.number().optional(),
+});
+
+export type ZoeyClientConfig = z.infer<typeof zoeyClientConfigSchema>;

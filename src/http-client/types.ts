@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { QueryParams } from "../zoey/types.js";
 import { ZoeyError } from "../errors/zoey-error.js";
+import { ZoeyQueryParams } from "../types.js";
 
 export type HttpMethod = "GET" | "PATCH" | "POST" | "PUT" | "DELETE";
 
@@ -27,7 +27,7 @@ export type MakeRequestOptions = {
   path: string;
   method?: HttpMethod;
   body?: JSONValue;
-  queryParams?: QueryParams;
+  queryParams?: ZoeyQueryParams;
 };
 
 export type MakeRequestResult =

@@ -47,7 +47,7 @@ const configOptions: ZoeyClientConfig = {
     }
 }
 
-const zoey = new ZoeyClient(configOptions);
+const zoey = new ZoeyClient(configOptions); // Throws ZoeyError with type: 'configuration'
 ```
 
 ## Basic Usage

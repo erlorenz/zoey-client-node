@@ -10,7 +10,7 @@ import {
   PermissionError,
   RateLimitError,
   ApiError,
-} from "../../src/index.js";
+} from "../../src/errors/errors.js";
 import { ZoeyError } from "../../src/errors/zoey-error.js";
 
 const badJSONResponse = new Response("<h1>NOT JSON</h1>", {
