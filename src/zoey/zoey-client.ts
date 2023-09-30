@@ -21,8 +21,8 @@ export class ZoeyClient {
     if (parsed.success) {
       return parsed.data;
     }
-    const paths = parsed.error.errors.map((e) => e.path[0]);
-    throw new ConfigurationError("Bad config, missing: " + paths.join(", "));
+    const paths = parsed.error.errors.map((e) => e.path.join("."));
+    throw new ConfigurationError("Invalid config: [" + paths.join(", ") + "]");
   }
 }
 

@@ -16,7 +16,7 @@ const missingParamConfig: ZoeyClientConfig = {
   auth: {
     consumerKey: "string",
     consumerSecret: "string",
-    accessToken: "string",
+    // accessToken: "string",
     // tokenSecret: "string",
   },
   baseUrl: "https://www.test.com",
