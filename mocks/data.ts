@@ -29,4 +29,34 @@ export const mockAccounts: MockAccount[] = [
     name: "Test Account 503",
     created_at: "2023-10-13 00:00:00Z",
   },
+  {
+    id: "504",
+    name: "Test Account 504",
+    created_at: "2023-10-14 00:00:00Z",
+  },
+  {
+    id: "505",
+    name: "Test Account 505",
+    created_at: "2023-10-15 00:00:00Z",
+  },
+  {
+    id: "506",
+    name: "Test Account 506",
+    created_at: "2023-10-16 00:00:00Z",
+  },
+  {
+    id: "507",
+    name: "Test Account 507",
+    created_at: "2023-10-17 00:00:00Z",
+  },
+  {
+    id: "508",
+    name: "Test Account 508",
+    created_at: "2023-10-18 00:00:00Z",
+  },
+  {
+    id: "509",
+    name: "Test Account 509",
+    created_at: "2023-10-19 00:00:00Z",
+  },
 ];
