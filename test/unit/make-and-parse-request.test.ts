@@ -1,20 +1,7 @@
-import {
-  describe,
-  it,
-  expect,
-  expectTypeOf,
-  beforeAll,
-  afterAll,
-  assert,
-} from "vitest";
-import { mockServer as server } from "../mocks/server.js";
-import { mockHttpClient as client } from "../mocks/http-client.js";
-import { MockAccount, mockAccountSchema } from "../mocks/data.js";
-import { z } from "zod";
+import { describe, it, expect, expectTypeOf, assert } from "vitest";
+import { mockHttpClient as client } from "../../mocks/http-client.js";
+import { MockAccount, mockAccountSchema } from "../../mocks/data.js";
 import { ZoeyError } from "../../src/index.js";
-
-beforeAll(() => server.listen({ onUnhandledRequest: "error" }));
-afterAll(() => server.close());
 
 describe("makeAndParseRequestFunction", () => {
   it('returns a ZoeyError with type: "invalid_return_type" when schema does not match response', async () => {
@@ -48,7 +35,7 @@ describe("makeAndParseRequestFunction", () => {
   it("returns a ZoeyError when response not ok", async () => {
     const result = await client.makeAndParseRequest({
       schema: mockAccountSchema,
-      path: "/badrequest",
+      path: "/notjson",
     });
 
     // Using assert to work with discrinated union

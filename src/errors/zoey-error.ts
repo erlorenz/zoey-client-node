@@ -5,6 +5,7 @@ export type ErrorType =
   | "authentication"
   | "permission"
   | "connection"
+  | "timeout"
   | "unknown"
   | "invalid_return_type"
   | "bad_json"

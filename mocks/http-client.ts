@@ -1,4 +1,4 @@
-import { ZoeyClient, ZoeyClientConfig } from "../../src/index.js";
+import { ZoeyClient, ZoeyClientConfig } from "../src/index.js";
 
 const mockConfig: ZoeyClientConfig = {
   baseUrl: "https://www.test.com/api/rest",
@@ -8,7 +8,7 @@ const mockConfig: ZoeyClientConfig = {
     accessToken: "access_token",
     tokenSecret: "token_secret",
   },
-  timeout: 15_000,
+  timeout: 15, // Mock server delay is 10 so only the manual timeout will trigger AbortError
 };
 
 export const mockHttpClient = new ZoeyClient(mockConfig).client;

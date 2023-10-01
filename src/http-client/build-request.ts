@@ -4,19 +4,20 @@ import OAuth from "oauth-1.0a";
 import { ZoeyClientConfig } from "../index.js";
 
 export function buildRequest({
-  opts: { path, method = "GET", queryParams, body },
+  opts: { path, method = "GET", queryParams, body, timeout },
   baseUrl,
   oauth,
   auth,
-  timeout,
+  defaultTimeout,
 }: {
   opts: MakeRequestOptions;
   baseUrl: string;
   oauth: OAuth;
   auth: ZoeyClientConfig["auth"];
-  timeout: number;
+  defaultTimeout: number;
 }): Request {
   const url = new URL(baseUrl + path);
+  const selectedTimeout = timeout || defaultTimeout;
 
   if (queryParams) {
     const paramsString = new URLSearchParams(queryParams).toString();
@@ -48,8 +49,8 @@ export function buildRequest({
   const options: RequestInit = {
     method,
     headers,
-    body,
-    signal: AbortSignal.timeout(timeout),
+    body: hasBody ? JSON.stringify(body) : undefined,
+    signal: AbortSignal.timeout(selectedTimeout),
   };
 
   return new Request(url.toString(), options);

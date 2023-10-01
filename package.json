@@ -1,6 +1,6 @@
 {
   "name": "zoey-client-node",
-  "version": "0.2.3",
+  "version": "0.3.0",
   "description": "A client library for working with the Zoey API.",
   "type": "module",
   "main": "./dist/index.cjs",

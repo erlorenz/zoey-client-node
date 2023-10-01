@@ -60,6 +60,39 @@ zoey.acccount.retrieve("bad_account_id"); // => { ok: false; error: ZoeyError }
 zoey.account.retrieve("good_account_id"); // => { ok: true; data: Account }
 ```
 
+You can also access the embedded `HttpClient` that has 3 methods: `makeRequest`, `makeAndParseRequest`, `makePaginatedRequest`.  
+Each takes a `MakeRequestOptions` object.  
+`makeAndParseRequest` and `makePaginatedRequest` both also take a schema.  
+`makePaginatedRequest` also takes `limit` and `maxPages` to control the amount of results.
+
+```ts
+const accountSchema = z.object({ id: z.string() });
+type Account = z.infer<typeof accountSchema>;
+
+const requestOptions: MakeRequestOptions = {
+  path: "/accounts/account"
+  queryParams: { id: "500" },
+  timeout: 5_000, // override default/initialized timeout
+  method: "GET", // defaults to GET
+  // body: some_body_object
+};
+
+zoey.client.makeRequest(requestOptions); // => { ok: true, data: unknown }
+
+zoey.client.makeAndParseRequest({
+  ...requestOptions,
+  schema: accountSchema,
+}); // => { ok: true, data: Account }
+
+zoey.client.makePaginatedRequest({
+  ...requestOptions,
+  path: "/accounts/list",
+  schema: z.array(accountSchema),
+  limit: 10,
+  maxPages: 2,
+}); // => { ok: true, data: Account[] }
+```
+
 ## Errors
 
 `ZoeyError` extends `Error` and always includes a `message` property and a `type` property.  
@@ -71,10 +104,17 @@ Based on the type code there may be other properties like the URL path, full res
 | `connection`          | There was an issue connecting to the Zoey API server. This is an error thrown by `fetch`. |
 | `invalid_return_type` | The return type from the Zoey API did not match the schema.                               |
 | `bad_json`            | The response body could not be parsed and threw a `SyntaxError`.                          |
+| `timeout`             | The fetch request threw a `TimeoutError` due to AbortSignal.timeout()                     |
+| `bad_request`         | The API returned a 400 status.                                                            |
+| `authentication`      | The API returned a 401 status.                                                            |
+| `permission`          | The API returned a 403 status.                                                            |
+| `not_found`           | The API returned a 404 status.                                                            |
+| `too_many_requests`   | The API returned a 429 status.                                                            |
+| `api_error`           | The API returned 500 or any other not specified status.                                   |
+| `unknown`             | The fetch request threw something that was not an instance of `Error`.                    |
 
 ## Todo:
 
 - Remove node-fetch when @types/node finally adds native Fetch types
 - Remove vitest when node test runner improves and loader with tsx is no longer experimental and can use watch
-- Test `makePaginatedRequest`
-- Add integration tests
+- Add live e2e tests that record data for msw

@@ -7,7 +7,7 @@ import {
 } from "./types.js";
 import OAuth from "oauth-1.0a";
 import { createOAuth } from "./oauth.js";
-import fetch from "node-fetch";
+import fetch, { AbortError } from "node-fetch";
 import { ZoeyError } from "../errors/zoey-error.js";
 import { generateApiError } from "../errors/generate-api-error.js";
 import { buildRequest } from "./build-request.js";
@@ -15,13 +15,13 @@ import { ZoeyClientConfig } from "../index.js";
 
 export class Client implements HttpClient {
   #auth: ZoeyClientConfig["auth"];
-  #timeout: number;
+  #defaultTimeout: number;
   #baseUrl: string;
   #oauth: OAuth;
 
   constructor(config: ZoeyClientConfig) {
     this.#auth = config.auth;
-    this.#timeout = config.timeout || 15_000;
+    this.#defaultTimeout = config.timeout || 15_000;
     this.#baseUrl = config.baseUrl;
     this.#oauth = createOAuth(
       config.auth.consumerKey,
@@ -35,7 +35,7 @@ export class Client implements HttpClient {
       baseUrl: this.#baseUrl,
       oauth: this.#oauth,
       auth: this.#auth,
-      timeout: this.#timeout,
+      defaultTimeout: this.#defaultTimeout,
     });
 
     try {
@@ -66,9 +66,20 @@ export class Client implements HttpClient {
           }),
         };
       }
-
-      // TODO: remove unknown when @types/node has fetch in it
     } catch (err) {
+      // TODO: remove import of AbortError once it's in the globals
+      if (err instanceof AbortError) {
+        return {
+          ok: false,
+          error: new ZoeyError({
+            type: "timeout",
+            message: err.message,
+            path: request.url,
+            cause: err,
+          }),
+        };
+      }
+
       if (err instanceof Error) {
         return {
           ok: false,
@@ -131,7 +142,7 @@ export class Client implements HttpClient {
 
   async makePaginatedRequest(
     opts: MakeRequestOptions & {
-      schema: z.ZodArray<z.ZodTypeAny>;
+      schema: z.ZodArray<z.ZodSchema>;
       limit: number;
       maxPages?: number;
     }

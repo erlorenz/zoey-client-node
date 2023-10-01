@@ -16,7 +16,7 @@ const oauth = createOAuth(auth.consumerKey, auth.consumerSecret);
 
 const baseUrl = "https://www.test.com/api/rest";
 
-const timeout = 15_000;
+const defaultTimeout = 15_000;
 
 describe("the build-request function", () => {
   describe("a simple GET", () => {
@@ -29,7 +29,7 @@ describe("the build-request function", () => {
       auth,
       oauth,
       baseUrl,
-      timeout,
+      defaultTimeout,
     });
 
     it("returns a request", () => {
@@ -75,7 +75,7 @@ describe("the build-request function", () => {
       auth,
       oauth,
       baseUrl,
-      timeout,
+      defaultTimeout,
     });
 
     it("adds the query params correctly", () => {
@@ -107,7 +107,7 @@ describe("the build-request function", () => {
       auth,
       oauth,
       baseUrl,
-      timeout,
+      defaultTimeout,
     });
 
     it("uses POST method from the options", () => {

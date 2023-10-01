@@ -28,6 +28,7 @@ export type MakeRequestOptions = {
   method?: HttpMethod;
   body?: JSONValue;
   queryParams?: ZoeyQueryParams;
+  timeout?: number;
 };
 
 export type MakeRequestResult =
@@ -47,14 +48,14 @@ export type MakeAndParseRequestFunction = <Tschema extends z.ZodSchema>(
 ) => Promise<Result<z.infer<Tschema>, ZoeyError>>;
 
 export type MakePaginatedRequestFunction = <
-  Tschema extends z.ZodArray<z.ZodTypeAny>
+  Tschema extends z.ZodArray<z.ZodSchema>
 >(
   options: MakeRequestOptions & {
     schema: Tschema;
     limit: number;
     maxPages?: number;
   }
-) => ReturnType<MakeAndParseRequestFunction>;
+) => Promise<Result<z.infer<Tschema>, ZoeyError>>;
 
 type Result<T, E extends Error> =
   | {
