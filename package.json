@@ -1,6 +1,6 @@
 {
   "name": "zoey-client-node",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "A client library for working with the Zoey API.",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -33,17 +33,17 @@
   "license": "ISC",
   "devDependencies": {
     "@types/node": "^20.8.9",
-    "chai": "^4.3.10",
     "dotenv": "^16.3.1",
     "msw": "^2.0.1",
     "tsup": "^7.2.0",
-    "tsx": "^3.13.0",
     "typescript": "^5.2.2",
     "vitest": "^0.34.4"
   },
   "dependencies": {
-    "oauth-1.0a": "^2.2.6",
-    "zod": "^3.22.2"
+    "oauth-1.0a": "^2.2.6"
+  },
+  "peerDependencies": {
+    "zod": "^3.20"
   },
   "engines": {
     "node": ">= 18"
