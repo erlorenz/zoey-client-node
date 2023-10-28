@@ -2,7 +2,7 @@
 
 ### Features
 
-- Minimal dependencies (`oauth-1.0a` and `zod`)
+- Minimal dependencies (`oauth-1.0a` which has zero dependencies)
 - Built as both CommonJS and ESM
 - Fully type-safe
 - Tested on MacOS and Ubuntu 20.04
@@ -15,7 +15,8 @@
 
 ## Requirements
 
-Node 18+ (uses native Fetch API).
+- Node 18+ (uses native Fetch API)
+- Zod 3.20+ (peer dependency)
 
 ## Installation
 
