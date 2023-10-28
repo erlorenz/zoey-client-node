@@ -17,8 +17,6 @@
 
 Node 18+ (uses native Fetch API).
 
-> **`@types/node` currently is missing the global Fetch type definition. In the meantime `node-fetch` is used as a workaround until this is resolved.**
-
 ## Installation
 
 Install the package with:
@@ -115,6 +113,5 @@ Based on the type code there may be other properties like the URL path, full res
 
 ## Todo:
 
-- Remove node-fetch when @types/node finally adds native Fetch types
 - Remove vitest when node test runner improves and loader with tsx is no longer experimental and can use watch
 - Add live e2e tests that record data for msw
