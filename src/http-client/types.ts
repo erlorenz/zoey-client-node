@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { ZoeyError } from "../errors/zoey-error.js";
-import { ZoeyQueryParams } from "../types.js";
+import type { ZoeyQueryParams } from "../types.js";
 
 export type HttpMethod = "GET" | "PATCH" | "POST" | "PUT" | "DELETE";
 
@@ -21,6 +21,7 @@ export type HttpClient = {
   makeRequest: MakeRequestFunction;
   makeAndParseRequest: MakeAndParseRequestFunction;
   makePaginatedRequest: MakePaginatedRequestFunction;
+  getDefaultTimeout: () => number;
 };
 
 export type MakeRequestOptions = {
@@ -41,23 +42,25 @@ export type MakeAndParseRequestResult<Tdata> =
 
 export type MakeRequestFunction = (
   options: MakeRequestOptions
-) => Promise<Result<unknown, ZoeyError>>;
+) => AsyncResult<unknown, ZoeyError>;
 
 export type MakeAndParseRequestFunction = <Tschema extends z.ZodSchema>(
   options: MakeRequestOptions & { schema: Tschema }
-) => Promise<Result<z.infer<Tschema>, ZoeyError>>;
+) => AsyncResult<z.infer<Tschema>, ZoeyError>;
 
 export type MakePaginatedRequestFunction = <
   Tschema extends z.ZodArray<z.ZodSchema>
 >(
   options: MakeRequestOptions & {
     schema: Tschema;
-    limit: number;
+    limit?: number;
     maxPages?: number;
   }
-) => Promise<Result<z.infer<Tschema>, ZoeyError>>;
+) => AsyncResult<z.infer<Tschema>, ZoeyError>;
 
-type Result<T, E extends Error> =
+export type AsyncResult<T, E extends Error> = Promise<Result<T, E>>;
+
+export type Result<T, E extends Error> =
   | {
       ok: true;
       data: T;

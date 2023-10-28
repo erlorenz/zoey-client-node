@@ -29,7 +29,7 @@ export class ZoeyError extends Error {
     type: ErrorType;
     message: string;
     path?: string;
-    cause?: Error;
+    cause?: unknown;
     statusCode?: number;
     responseBody?: unknown;
   }) {

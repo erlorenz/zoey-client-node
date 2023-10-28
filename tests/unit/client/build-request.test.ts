@@ -1,9 +1,8 @@
 import { expect, it, describe } from "vitest";
-import { buildRequest } from "../../src/http-client/build-request.js";
-import { ZoeyClientConfig } from "../../src/index.js";
-import { createOAuth } from "../../src/http-client/oauth.js";
-import { MakeRequestOptions } from "../../src/http-client/types.js";
-import { Request } from "node-fetch";
+import { buildRequest } from "../../../src/http-client/build-request.js";
+import type { ZoeyClientConfig } from "../../../src/index.js";
+import { createOAuth } from "../../../src/http-client/oauth.js";
+import type { MakeRequestOptions } from "../../../src/http-client/types.js";
 
 const auth: ZoeyClientConfig["auth"] = {
   accessToken: "sfdsafa",

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import {
+import type {
   HttpClient,
   MakeAndParseRequestResult,
   MakeRequestOptions,
@@ -7,17 +7,17 @@ import {
 } from "./types.js";
 import OAuth from "oauth-1.0a";
 import { createOAuth } from "./oauth.js";
-import fetch, { AbortError } from "node-fetch";
 import { ZoeyError } from "../errors/zoey-error.js";
 import { generateApiError } from "../errors/generate-api-error.js";
 import { buildRequest } from "./build-request.js";
-import { ZoeyClientConfig } from "../index.js";
+import type { ZoeyClientConfig } from "../index.js";
+import { ensureError } from "../errors/ensure-error.js";
 
 export class Client implements HttpClient {
   #auth: ZoeyClientConfig["auth"];
-  #defaultTimeout: number;
   #baseUrl: string;
   #oauth: OAuth;
+  #defaultTimeout: number;
 
   constructor(config: ZoeyClientConfig) {
     this.#auth = config.auth;
@@ -67,27 +67,15 @@ export class Client implements HttpClient {
         };
       }
     } catch (err) {
-      // TODO: remove import of AbortError once it's in the globals
-      if (err instanceof AbortError) {
+      const error = ensureError(err);
+      if (error.name === "TimeoutError") {
         return {
           ok: false,
           error: new ZoeyError({
             type: "timeout",
-            message: err.message,
+            message: error.message,
             path: request.url,
-            cause: err,
-          }),
-        };
-      }
-
-      if (err instanceof Error) {
-        return {
-          ok: false,
-          error: new ZoeyError({
-            type: "connection",
-            message: err.message,
-            path: request.url,
-            cause: err,
+            cause: error,
           }),
         };
       }
@@ -95,10 +83,10 @@ export class Client implements HttpClient {
       return {
         ok: false,
         error: new ZoeyError({
-          type: "unknown",
-          message: "Not instance of Error in catch: " + JSON.stringify(err),
+          type: "connection",
+          message: error.message,
           path: request.url,
-          cause: new Error(JSON.stringify(err)),
+          cause: error,
         }),
       };
     }
@@ -107,12 +95,8 @@ export class Client implements HttpClient {
   async makeAndParseRequest(
     opts: MakeRequestOptions & { schema: z.ZodSchema }
   ): Promise<MakeAndParseRequestResult<z.infer<typeof opts.schema>>> {
-    const result = await this.makeRequest({
-      path: opts.path,
-      method: opts.method,
-      body: opts.body,
-      queryParams: opts.queryParams,
-    });
+    const { schema, ...rest } = opts;
+    const result = await this.makeRequest(rest);
     if (!result.ok) {
       return {
         ok: false,
@@ -120,7 +104,7 @@ export class Client implements HttpClient {
       };
     }
 
-    const parseResult = opts.schema.safeParse(result.data);
+    const parseResult = schema.safeParse(result.data);
     if (!parseResult.success) {
       return {
         ok: false,
@@ -143,12 +127,12 @@ export class Client implements HttpClient {
   async makePaginatedRequest(
     opts: MakeRequestOptions & {
       schema: z.ZodArray<z.ZodSchema>;
-      limit: number;
+      limit?: number;
       maxPages?: number;
     }
   ): Promise<MakeAndParseRequestResult<z.infer<typeof opts.schema>>> {
-    const queryParams = { ...opts.queryParams };
-    queryParams.limit = opts.limit.toString();
+    const { queryParams = {}, limit = 10, maxPages } = opts;
+    queryParams.limit = limit.toString();
 
     let more = true;
     let page = 1;
@@ -174,11 +158,11 @@ export class Client implements HttpClient {
       list.push(...result.data);
       page++;
 
-      if (result.data.length < opts.limit) {
+      if (result.data.length < limit) {
         more = false;
       }
 
-      if (opts.maxPages && page > opts.maxPages) {
+      if (maxPages && page > maxPages) {
         more = false;
       }
     }
@@ -187,5 +171,9 @@ export class Client implements HttpClient {
       ok: true,
       data: list,
     };
+  }
+
+  getDefaultTimeout() {
+    return this.#defaultTimeout;
   }
 }

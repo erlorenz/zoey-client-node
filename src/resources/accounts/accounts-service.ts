@@ -1,30 +1,30 @@
 import { z } from "zod";
-import { HttpClient } from "../../http-client/types.js";
-import { ZoeyListOptions, ZoeyResourceId } from "../../types.js";
+import type { HttpClient } from "../../http-client/types.js";
+import type { ZoeyListOptions, ZoeyResourceId } from "../../types.js";
 import { accountListSchema, accountSchema } from "../../models/account.js";
-import { CreateAccountRequestBody } from "./accounts-request.js";
+import type { CreateAccountRequestBody } from "./accounts-request.js";
 
 export class AccountsService {
   #client: HttpClient;
-  #resourcePath = "/companyAccounts";
+  readonly resourcePath = "/companyAccounts";
 
   constructor(client: HttpClient) {
     this.#client = client;
   }
 
-  async list({ queryParams, limit = 10, maxPages }: ZoeyListOptions) {
+  async list({ queryParams, limit, maxPages }: ZoeyListOptions) {
     return await this.#client.makePaginatedRequest({
-      path: this.#resourcePath + "/list",
-      limit,
+      path: this.resourcePath + "/list",
       queryParams,
       schema: accountListSchema,
+      limit,
       maxPages,
     });
   }
 
   async retrieve(id: ZoeyResourceId) {
     return await this.#client.makeAndParseRequest({
-      path: this.#resourcePath + "/account",
+      path: this.resourcePath + "/account",
       queryParams: { id },
       schema: accountSchema,
     });
@@ -32,7 +32,8 @@ export class AccountsService {
 
   async create(body: CreateAccountRequestBody) {
     return await this.#client.makeAndParseRequest({
-      path: this.#resourcePath + "/account",
+      path: this.resourcePath + "/account",
+      method: "POST",
       schema: z.object({ id: z.string() }),
       body,
     });

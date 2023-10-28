@@ -1,7 +1,6 @@
-import { Request, RequestInit } from "node-fetch";
-import { MakeRequestOptions } from "./types.js";
+import type { MakeRequestOptions } from "./types.js";
 import OAuth from "oauth-1.0a";
-import { ZoeyClientConfig } from "../index.js";
+import type { ZoeyClientConfig } from "../index.js";
 
 export function buildRequest({
   opts: { path, method = "GET", queryParams, body, timeout },
@@ -26,7 +25,7 @@ export function buildRequest({
 
   const { Authorization } = oauth.toHeader(
     oauth.authorize(
-      { url: url.toString(), method: method ?? "GET", data: null },
+      { url: url.toString(), method, data: null },
       {
         key: auth.accessToken,
         secret: auth.tokenSecret,
@@ -46,11 +45,14 @@ export function buildRequest({
     headers["Content-Type"] = "application/json";
   }
 
+  body = JSON.stringify(body);
+  const signal = AbortSignal.timeout(selectedTimeout);
+
   const options: RequestInit = {
     method,
     headers,
-    body: hasBody ? JSON.stringify(body) : undefined,
-    signal: AbortSignal.timeout(selectedTimeout),
+    body,
+    signal,
   };
 
   return new Request(url.toString(), options);

@@ -1,3 +1,3 @@
-export { ZoeyClient, ZoeyClientConfig } from "./zoey/zoey-client.js";
-export type { ZoeyListOptions, ZoeyQueryParams } from "./types.js";
+export { ZoeyClient, type ZoeyClientConfig } from "./zoey/zoey-client.js";
 export { ZoeyError } from "./errors/zoey-error.js";
+export * from "./types.js";

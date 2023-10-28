@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { Response } from "node-fetch";
 import { ZoeyError } from "./zoey-error.js";
 
 const apiErrorResponseSchema = z.object({

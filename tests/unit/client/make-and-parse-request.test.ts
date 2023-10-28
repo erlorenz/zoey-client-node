@@ -1,7 +1,7 @@
 import { describe, it, expect, expectTypeOf, assert } from "vitest";
-import { mockHttpClient as client } from "../../mocks/http-client.js";
-import { MockAccount, mockAccountSchema } from "../../mocks/data.js";
-import { ZoeyError } from "../../src/index.js";
+import { mockHttpClient as client } from "../../../mocks/http-client.js";
+import { type MockAccount, mockAccountSchema } from "../../../mocks/data.js";
+import { ZoeyError } from "../../../src/index.js";
 
 describe("makeAndParseRequestFunction", () => {
   it('returns a ZoeyError with type: "invalid_return_type" when schema does not match response', async () => {

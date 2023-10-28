@@ -1,5 +1,5 @@
 import { Client } from "../http-client/http-client.js";
-import { HttpClient } from "../http-client/types.js";
+import type { HttpClient } from "../http-client/types.js";
 import { ZoeyError } from "../errors/zoey-error.js";
 import { AccountsService } from "../resources/accounts/accounts-service.js";
 import { z } from "zod";

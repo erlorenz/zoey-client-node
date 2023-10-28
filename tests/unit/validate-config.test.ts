@@ -1,7 +1,11 @@
 import { describe, it, expect } from "vitest";
-import { ZoeyClient, ZoeyClientConfig, ZoeyError } from "../../src/index.js";
+import {
+  ZoeyClient,
+  type ZoeyClientConfig,
+  ZoeyError,
+} from "../../src/index.js";
 
-const goodConfig: ZoeyClientConfig = {
+export const goodConfig: ZoeyClientConfig = {
   auth: {
     consumerKey: "string",
     consumerSecret: "string",

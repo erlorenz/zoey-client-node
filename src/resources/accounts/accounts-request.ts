@@ -1,8 +1,5 @@
-import {
-  ZoeyBooleanNumber,
-  ZoeyPaymentMethodCode,
-  ZoeyResourceId,
-} from "../../types.js";
+import type { ZoeyPaymentMethodCode } from "../../models/core.js";
+import type { ZoeyBooleanNumber, ZoeyResourceId } from "../../types.js";
 
 export type CreateAccountRequestBody = {
   companyData: {
@@ -25,14 +22,14 @@ type AccountAddress = {
   firstname: string;
   lastname: string;
   telephone: string;
-  address_type: string;
-  is_default_billing_address?: ZoeyBooleanNumber;
+  address_type: "billing" | "shipping" | "billing,shipping";
+  is_default_billing_address: ZoeyBooleanNumber;
+  is_default_shipping_address?: ZoeyBooleanNumber;
   street: string[];
   city: string;
   region: string;
   postcode: string;
   country_id: string;
-  is_default_shipping_address?: ZoeyBooleanNumber;
   location_ids?: ZoeyResourceId[];
 };
 

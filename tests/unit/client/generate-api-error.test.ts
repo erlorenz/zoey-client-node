@@ -1,7 +1,6 @@
-import { Response } from "node-fetch";
 import { describe, expect, it } from "vitest";
-import { generateApiError } from "../../src/errors/generate-api-error.js";
-import { ZoeyError } from "../../src/index.js";
+import { generateApiError } from "../../../src/errors/generate-api-error.js";
+import { ZoeyError } from "../../../src/index.js";
 
 const badJSONResponse = new Response("<h1>NOT JSON</h1>", {
   status: 200,

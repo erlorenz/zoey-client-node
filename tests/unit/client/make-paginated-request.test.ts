@@ -1,7 +1,7 @@
 import { describe, it, expect, assert } from "vitest";
-import { mockHttpClient as client } from "../../mocks/http-client.js";
-import { mockAccountSchema, mockAccounts } from "../../mocks/data.js";
-import { ZoeyError } from "../../src/index.js";
+import { mockHttpClient as client } from "../../../mocks/http-client.js";
+import { mockAccountSchema, mockAccounts } from "../../../mocks/data.js";
+import { ZoeyError } from "../../../src/index.js";
 import { z } from "zod";
 
 describe("makePaginatedRequestFunction (limit, maxPages, totalItems)", () => {
