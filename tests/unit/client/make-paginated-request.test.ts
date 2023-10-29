@@ -1,11 +1,12 @@
-import { describe, it, expect, assert } from "vitest";
+import { describe, test, assert } from "vitest";
 import { mockHttpClient as client } from "../../../mocks/http-client.js";
 import { mockAccountSchema, mockAccounts } from "../../../mocks/data.js";
 import { ZoeyError } from "../../../src/index.js";
 import { z } from "zod";
+import { assertIsNotOk, assertisOk } from "../../helpers.js";
 
 describe("makePaginatedRequestFunction (limit, maxPages, totalItems)", () => {
-  it("returns a ZoeyError when response not ok", async () => {
+  test("returns a ZoeyError when response not ok", async () => {
     const result = await client.makePaginatedRequest({
       schema: z.array(mockAccountSchema),
       limit: 1,
@@ -13,13 +14,10 @@ describe("makePaginatedRequestFunction (limit, maxPages, totalItems)", () => {
       path: "/notjson",
     });
 
-    // Using assert to work with discrinated union
-    assert(!result.ok, "expected property ok to be false");
-    expect(result).to.have.property("error").and.to.not.have.property("data");
-    expect(result.error).to.be.instanceOf(ZoeyError);
+    assertIsNotOk(result);
   });
 
-  it('returns a ZoeyError with type: "invalid_return_type" when schema does not match response', async () => {
+  test('returns a ZoeyError with type: "invalid_return_type" when schema does not match response', async () => {
     const result = await client.makePaginatedRequest({
       schema: z.array(mockAccountSchema),
       limit: 1,
@@ -28,16 +26,12 @@ describe("makePaginatedRequestFunction (limit, maxPages, totalItems)", () => {
     });
 
     // Using assert to work with discrinated union
-    assert(!result.ok, "expected property ok to be false");
-    expect(result).to.have.property("error").and.to.not.have.property("data");
-    expect(result.error)
-      .to.be.instanceOf(ZoeyError)
-      .and.to.have.property("type")
-      .that.equals("invalid_return_type");
-    expect(result.error).to.have.property("responseBody").that.does.exist;
+    assertIsNotOk(result);
+    assert.strictEqual(result.error.type, "invalid_return_type");
+    assert.exists(result.error.responseBody);
   });
 
-  it("returns limit * maxPages items when less than total items (1, 3, 10)", async () => {
+  test("returns limit * maxPages items when less than total items (1, 3, 10)", async () => {
     const schema = z.array(mockAccountSchema);
     const limit = 1;
     const maxPages = 3;
@@ -50,14 +44,14 @@ describe("makePaginatedRequestFunction (limit, maxPages, totalItems)", () => {
       path: "/accounts/list",
     });
 
-    // Using assert to work with discrinated union
-    assert(result.ok, "expected property ok to be true");
-    expect(result).to.have.property("data").and.to.not.have.property("error");
-    expect(result.data).to.have.length.that.is.lessThan(totalItems);
-    expect(result.data).to.have.lengthOf(3);
+    assertisOk(result);
+    assert.isArray(result.data);
+    const length = result.data.length;
+    assert.isBelow(length, totalItems);
+    assert.strictEqual(length, 3);
   });
 
-  it("returns the total list when limit * maxPages is greater than total items (1, 11, 10)", async () => {
+  test("returns the total list when limit * maxPages is greater than total items (1, 11, 10)", async () => {
     const schema = z.array(mockAccountSchema);
     const limit = 1;
     const maxPages = 11;
@@ -71,12 +65,12 @@ describe("makePaginatedRequestFunction (limit, maxPages, totalItems)", () => {
     });
 
     // Using assert to work with discrinated union
-    assert(result.ok, "expected property ok to be true");
-    expect(result).to.have.property("data").and.to.not.have.property("error");
-    expect(result.data).to.have.length(totalItems);
+    assertisOk(result);
+    assert.isArray(result.data);
+    assert.lengthOf(result.data, totalItems);
   });
 
-  it("returns the total list when there are no maxPages (1, _, 10)", async () => {
+  test("returns the total list when there are no maxPages (1, _, 10)", async () => {
     const schema = z.array(mockAccountSchema);
     const limit = 1;
     const totalItems = mockAccounts.length; // 10
@@ -87,10 +81,10 @@ describe("makePaginatedRequestFunction (limit, maxPages, totalItems)", () => {
       path: "/accounts/list",
     });
 
-    // Using assert to work with discrinated union
-    assert(result.ok, "expected property ok to be true");
-    expect(result).to.have.property("data").and.to.not.have.property("error");
-    expect(result.data).to.have.length.that.is.greaterThan(limit);
-    expect(result.data).to.have.lengthOf(totalItems);
+    assertisOk(result);
+    assert.isArray(result.data);
+    const length = result.data.length;
+    assert.isAbove(length, limit);
+    assert.strictEqual(length, totalItems);
   });
 });

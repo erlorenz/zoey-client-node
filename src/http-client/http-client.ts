@@ -80,19 +80,6 @@ export class Client implements HttpClient {
         };
       }
 
-      // Was not an error that was thrown
-      if (error.name === "TypeError") {
-        return {
-          ok: false,
-          error: new ZoeyError({
-            type: "unknown",
-            message: error.message,
-            path: request.url,
-            cause: error,
-          }),
-        };
-      }
-
       // Connection error
       return {
         ok: false,

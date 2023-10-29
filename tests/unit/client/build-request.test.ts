@@ -1,4 +1,4 @@
-import { expect, it, describe } from "vitest";
+import { assert, test, describe } from "vitest";
 import { buildRequest } from "../../../src/http-client/build-request.js";
 import type { ZoeyClientConfig } from "../../../src/index.js";
 import { createOAuth } from "../../../src/http-client/oauth.js";
@@ -31,32 +31,27 @@ describe("the build-request function", () => {
       defaultTimeout,
     });
 
-    it("returns a request", () => {
-      expect(req).is.an.instanceOf(Request);
-      expect(req)
-        .to.have.property("url")
-        .that.equals("https://www.test.com/api/rest/accounts");
+    test("returns a request", () => {
+      assert.instanceOf(req, Request);
     });
 
-    it("combines the baseurl and path correctly", () => {
-      expect(req)
-        .to.have.property("url")
-        .that.equals("https://www.test.com/api/rest/accounts");
+    test("combines the baseurl and path correctly", () => {
+      assert.strictEqual(req.url, "https://www.test.com/api/rest/accounts");
     });
 
-    it("defaults to a GET", () => {
-      expect(req).to.have.property("method").that.equals("GET");
+    test("defaults to a GET", () => {
+      assert.strictEqual(req.method, "GET");
     });
 
-    it("has auth header and no content type", () => {
+    test("has auth header and no content type", () => {
       const headers = req.headers;
-
-      expect(headers.get("Authorization")).to.exist.and.to.contain("OAuth");
-      expect(headers.get("Content-Type")).to.not.exist;
+      assert.notExists(headers.get("Content-Type"));
+      assert.exists(headers.get("Authorization"));
+      assert.include(headers.get("Authorization"), "OAuth");
     });
 
-    it("has no body", () => {
-      expect(req.body).to.not.exist;
+    test("has no body", () => {
+      assert.notExists(req.body);
     });
   });
 
@@ -77,20 +72,18 @@ describe("the build-request function", () => {
       defaultTimeout,
     });
 
-    it("adds the query params correctly", () => {
-      expect(req)
-        .to.have.property("url")
-        .that.equals(
-          "https://www.test.com/api/rest/accounts?limit=15&created_at%5Bgt%5D=some+datetime"
-        );
+    test("adds the query params correctly", () => {
+      assert.strictEqual(
+        req.url,
+        "https://www.test.com/api/rest/accounts?limit=15&created_at%5Bgt%5D=some+datetime"
+      );
 
       const url = new URL(req.url);
-      expect(url.host).to.equal("www.test.com");
-      expect(url.pathname).to.equal("/api/rest/accounts");
-      expect(url.searchParams.has("limit", "15")).to.be.true;
-      expect(url.searchParams.has("created_at[gt]", "some datetime")).to.be
-        .true;
-      expect(url.searchParams.has("random_other_param")).to.be.false;
+      assert.strictEqual(url.host, "www.test.com");
+      assert.strictEqual(url.pathname, "/api/rest/accounts");
+      assert.isTrue(url.searchParams.has("limit", "15"));
+      assert.isTrue(url.searchParams.has("created_at[gt]", "some datetime"));
+      assert.isFalse(url.searchParams.has("random_other_param"));
     });
   });
 
@@ -109,24 +102,22 @@ describe("the build-request function", () => {
       defaultTimeout,
     });
 
-    it("uses POST method from the options", () => {
-      expect(req.method).to.equal("POST");
+    test("uses POST method from the options", () => {
+      assert.strictEqual(req.method, "POST");
     });
 
-    it("has no query params", () => {
+    test("has no query params", () => {
       const url = new URL(req.url);
-      expect(url.pathname).to.equal("/api/rest/accounts");
-      expect(url.search).to.be.empty;
+      assert.strictEqual(url.pathname, "/api/rest/accounts");
+      assert.isEmpty(url.search);
     });
 
-    it("added a content type header", () => {
-      expect(req.headers.get("Content-Type")).to.exist.and.to.equal(
-        "application/json"
-      );
+    test("contains a content type header", () => {
+      assert.strictEqual(req.headers.get("Content-Type"), "application/json");
     });
 
-    it("added a body", () => {
-      expect(req.body).to.exist;
+    test("contains a body", () => {
+      assert.exists(req.body);
     });
   });
 });

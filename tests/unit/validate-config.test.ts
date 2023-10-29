@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, test, assert } from "vitest";
 import {
   ZoeyClient,
   type ZoeyClientConfig,
@@ -36,11 +36,18 @@ const emptyParamConfig: ZoeyClientConfig = {
 };
 
 describe("validate config", () => {
-  it("should throw a configuration error when param is empty", () => {
-    expect(() => ZoeyClient.validateConfig(emptyParamConfig))
-      .to.throw(ZoeyError)
-      .that.has.property("type")
-      .that.equals("configuration");
+  test("throws a configuration error when param is empty", () => {
+    const config = emptyParamConfig;
+    assert.throws(() => ZoeyClient.validateConfig(config), ZoeyError);
+
+    let type = "";
+    try {
+      ZoeyClient.validateConfig(config);
+    } catch (err: any) {
+      type = err.type;
+    }
+
+    assert.strictEqual(type, "configuration");
   });
 
   // it("should throw a ConfigurationError when param is empty TEST FAIL", () => {
@@ -50,25 +57,25 @@ describe("validate config", () => {
   //     .that.equals("configuration");
   // });
 
-  it("should throw a configuration error when param is missing", () => {
-    expect(() => ZoeyClient.validateConfig(missingParamConfig))
-      .to.throw(ZoeyError)
-      .that.has.property("type")
-      .that.equals("configuration");
+  test("should throw a configuration error when param is missing", () => {
+    assert.throws(
+      () => ZoeyClient.validateConfig(missingParamConfig),
+      ZoeyError
+    );
   });
 
-  it("should throw a configuration error when baseUrl is not valid url", () => {
+  test("should throw a configuration error when baseUrl is not valid url", () => {
     const invalidbaseUrlConfig: ZoeyClientConfig = {
       auth: { ...missingParamConfig.auth },
       baseUrl: "hello.com",
     };
-    expect(() => ZoeyClient.validateConfig(invalidbaseUrlConfig))
-      .to.throw(ZoeyError)
-      .that.has.property("type")
-      .that.equals("configuration");
+    assert.throws(
+      () => ZoeyClient.validateConfig(invalidbaseUrlConfig),
+      ZoeyError
+    );
   });
 
-  it("should not throw an error when initializing with correct params", () => {
-    expect(() => ZoeyClient.validateConfig(goodConfig)).not.to.throw();
+  test("should not throw an error when initializing with correct params", () => {
+    assert.doesNotThrow(() => ZoeyClient.validateConfig(goodConfig));
   });
 });

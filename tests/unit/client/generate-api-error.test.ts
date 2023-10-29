@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, assert, test } from "vitest";
 import { generateApiError } from "../../../src/errors/generate-api-error.js";
 import { ZoeyError } from "../../../src/index.js";
 
@@ -21,86 +21,44 @@ const validBody = JSON.stringify({
   },
 });
 
+const errorMap: Map<number, string> = new Map([
+  [400, "bad_request"],
+  [401, "authentication"],
+  [402, "api_error"],
+  [403, "permission"],
+  [404, "not_found"],
+  [429, "too_many_requests"],
+  [500, "api_error"],
+  [505, "api_error"],
+]);
+
 describe("generate API error", () => {
-  it("returns ZoeyError with type: 'bad_json' on unparseable JSON", async () => {
+  test("returns ZoeyError with type: 'bad_json' on unparseable JSON", async () => {
     const err = await generateApiError("/test", badJSONResponse);
 
-    expect(err).to.be.instanceOf(ZoeyError);
-    expect(err).to.have.property("type").that.equals("bad_json");
+    assert.instanceOf(err, ZoeyError);
+    assert.strictEqual(err.type, "bad_json");
   });
 
-  it("returns ZoeyError with type: 'invalid_return_type' when response does not match error schema", async () => {
+  test("returns ZoeyError with type: 'invalid_return_type' when response does not match error schema", async () => {
     const err = await generateApiError("/test", invalidReturnBodyResponse);
 
-    expect(err).to.be.instanceOf(ZoeyError);
-    expect(err).to.have.property("type").that.equals("invalid_return_type");
+    assert.instanceOf(err, ZoeyError);
+    assert.strictEqual(err.type, "invalid_return_type");
   });
 
-  it("returns ZoeyError with type: 'bad_request' on status 400", async () => {
-    const response = new Response(validBody, { status: 400 });
-
-    const err = await generateApiError("/test", response);
-
-    expect(err).to.be.instanceOf(ZoeyError);
-    expect(err).to.have.property("type").that.equals("bad_request");
-  });
-
-  it("returns ZoeyError with type: 'authentication' on status 401", async () => {
-    const response = new Response(validBody, { status: 401 });
-
-    const err = await generateApiError("/test", response);
-
-    expect(err).to.be.instanceOf(ZoeyError);
-    expect(err).to.have.property("type").that.equals("authentication");
-  });
-
-  it("returns ZoeyError with type: 'permission' on status 403", async () => {
-    const response = new Response(validBody, { status: 403 });
-
-    const err = await generateApiError("/test", response);
-
-    expect(err).to.be.instanceOf(ZoeyError);
-    expect(err).to.have.property("type").that.equals("permission");
-  });
-
-  it("returns ZoeyError with type: 'not_found' on status 404", async () => {
-    const response = new Response(validBody, { status: 404 });
-
-    const err = await generateApiError("/test", response);
-
-    expect(err).to.be.instanceOf(ZoeyError);
-    expect(err).to.have.property("type").that.equals("not_found");
-  });
-
-  it("returns ZoeyError with type: 'too_many_requests' on status 429", async () => {
-    const response = new Response(validBody, { status: 429 });
-
-    const err = await generateApiError("/test", response);
-
-    expect(err).to.be.instanceOf(ZoeyError);
-    expect(err).to.have.property("type").that.equals("too_many_requests");
-  });
-
-  it("returns ZoeyError with type: 'api_error' on status 500", async () => {
-    const response = new Response(validBody, { status: 500 });
-
-    const err = await generateApiError("/test", response);
-
-    expect(err).to.be.instanceOf(ZoeyError);
-    expect(err).to.have.property("type").that.equals("api_error");
-  });
-
-  it("returns ZoeyError with type: 'api_error' on other statuses", async () => {
-    const response402 = new Response(validBody, { status: 402 });
-    const response505 = new Response(validBody, { status: 505 });
-
-    const err402 = await generateApiError("/test", response402);
-    const err505 = await generateApiError("/test", response505);
-
-    expect(err402).to.be.instanceOf(ZoeyError);
-    expect(err402).to.have.property("type").that.equals("api_error");
-
-    expect(err505).to.be.instanceOf(ZoeyError);
-    expect(err505).to.have.property("type").that.equals("api_error");
-  });
+  testErrorMap();
 });
+
+// Test for the type by status code
+function testErrorMap() {
+  for (const [status, type] of errorMap) {
+    test(`returns ZoeyError with type: '${type}' on status ${status}`, async () => {
+      const response = new Response(validBody, { status });
+      const err = await generateApiError("/test", response);
+
+      assert.instanceOf(err, ZoeyError);
+      assert.strictEqual(err.type, type);
+    });
+  }
+}
