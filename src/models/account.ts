@@ -34,7 +34,7 @@ const accountNetTermSchema = z.object({
   enabled: booleanStringSchema,
   term: z.string(),
   credit: z.string(),
-  detail: z.string(),
+  detail: z.string().nullable(),
   company_location_id: z.string(),
   disable_past_due: booleanStringSchema,
   disable_past_due_day: z.string().nullable(),
