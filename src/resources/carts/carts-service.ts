@@ -71,7 +71,7 @@ export class CartsService {
       method: "PUT",
       body: {
         cartId,
-        customerData: [
+        customerAddressData: [
           {
             mode: "billing",
             ...addresses.billing,
