@@ -1,6 +1,6 @@
 {
   "name": "@eldev/zoey-client-node",
-  "version": "0.5.3",
+  "version": "0.5.4",
   "description": "A client library for working with the Zoey API.",
   "type": "module",
   "files": [
@@ -26,7 +26,8 @@
     "lint": "tsc",
     "coverage": "vitest run unit --coverage",
     "build": "npm run clean && npm run lint && tsup src/index.ts --format cjs,esm --dts",
-    "clean": "rm -rf dist coverage"
+    "clean": "rm -rf dist coverage",
+    "publish": "npm run build && npm publish --access public"
   },
   "repository": {
     "type": "git",
