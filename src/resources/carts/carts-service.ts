@@ -67,7 +67,7 @@ export class CartsService {
     }
   ): AsyncResult<null, ZoeyError> {
     const result = await this.#client.makeRequest({
-      path: this.resourcePath + "/cart_customer",
+      path: this.resourcePath + "/cart_addresses",
       method: "PUT",
       body: {
         cartId,
