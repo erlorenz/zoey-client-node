@@ -36,14 +36,14 @@ export class CartsService {
 
   async setContact(
     cartId: number,
-    customerId: number
+    customerData: { customer_id: number; company_location_id: number }
   ): AsyncResult<null, ZoeyError> {
     const result = await this.#client.makeRequest({
       path: this.resourcePath + "/cart_customer",
       method: "PUT",
       body: {
         cartId,
-        customerData: { customer_id: customerId, mode: "customer" },
+        customerData: { ...customerData, mode: "customer" },
       },
     });
     if (!result.ok) return result;
@@ -53,7 +53,7 @@ export class CartsService {
   async setAddress(
     cartId: number,
     addresses: {
-      billing: { company_location_id: number; company_address_id: number };
+      billing: { company_address_id: number };
       shipping: {
         firstname: string;
         lastname: string;
