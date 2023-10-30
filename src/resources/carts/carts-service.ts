@@ -137,13 +137,13 @@ export class CartsService {
     return { ok: true, data: null };
   }
 
-  async convertToOrder(cartId: number): AsyncResult<null, ZoeyError> {
-    const result = await this.#client.makeRequest({
+  async convertToOrder(cartId: number): AsyncResult<string, ZoeyError> {
+    const result = await this.#client.makeAndParseRequest({
       path: this.resourcePath + "/cart_order",
       method: "POST",
       body: { id: cartId },
+      schema: z.string(),
     });
-    if (!result.ok) return result;
-    return { ok: true, data: null };
+    return result;
   }
 }
