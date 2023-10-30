@@ -49,7 +49,11 @@ export class Client implements HttpClient {
         };
       }
 
-      if (res.status === 204) {
+      const isJson = !!res.headers
+        .get("Content-Type")
+        ?.includes("application/json");
+
+      if (res.status === 204 || !isJson) {
         return { ok: true, data: null };
       }
 
