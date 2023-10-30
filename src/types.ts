@@ -9,10 +9,11 @@ export type ZoeyListOptions = {
 // Datatypes
 export type ZoeyResourceId = string;
 export type ZoeyDateTime = string;
-export type ZoeyBooleanNumber = 0 | 1;
 export type {
   ZoeyBooleanString,
   ZoeyPaymentMethodCode,
+  ZoeyBooleanNumber,
+  ZoeyStringOrArray,
 } from "./models/core.js";
 
 // Models
