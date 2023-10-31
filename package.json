@@ -31,7 +31,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/erlorenz/zoey-client-node.git"
+    "url": "git+https://github.com/erlorenz/zoey-client-node.git"
   },
   "author": "Erik Lorenz",
   "license": "ISC",
