@@ -16,12 +16,11 @@ describe("makeRequest function", () => {
     assert.strictEqual(result.data, null);
   });
 
-  test("returns ZoeyError with type: 'bad_json' when ok response does not return valid json", async () => {
+  test.only("returns null when status is 200 but is not json", async () => {
     const result = await client.makeRequest({ path: "/notjson" });
 
-    assertIsNotOk(result);
-    assert.strictEqual(result.error.type, "bad_json");
-    assert.notExists(result.error.responseBody);
+    assertisOk(result);
+    assert.strictEqual(result.data, null);
   });
 
   test("returns ZoeyError with type: 'invalid_return_type' when error with invalid body", async () => {

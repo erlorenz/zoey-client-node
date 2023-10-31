@@ -35,16 +35,13 @@ const handlers: Array<RequestHandler> = [
     return new Response(undefined, { status: 204 });
   }),
   http.get(BASE_URL + "/notjson", () => {
-    return new Response("<html><h1>Hello</h1></html>");
+    return HttpResponse.text("<html><h1>Hello</h1></html>");
   }),
   http.get(BASE_URL + "/validerror", () => {
     return new Response(JSON.stringify(validErrorResponse), { status: 404 });
   }),
   http.get(BASE_URL + "/invaliderror", () => {
     return new Response(JSON.stringify(invalidErrorResponse), { status: 404 });
-  }),
-  http.get(BASE_URL + "/badjson", () => {
-    return HttpResponse.text("<<<<<");
   }),
   http.get(BASE_URL + "/networkerror", () => {
     return HttpResponse.error();

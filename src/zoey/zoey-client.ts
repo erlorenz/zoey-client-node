@@ -3,16 +3,19 @@ import type { HttpClient } from "../http-client/types.js";
 import { ZoeyError } from "../errors/zoey-error.js";
 import { AccountsService } from "../resources/accounts/accounts-service.js";
 import { z } from "zod";
+import { CartsService } from "../resources/carts/carts-service.js";
 
 export class ZoeyClient {
   readonly client: HttpClient;
   readonly accounts: AccountsService;
+  readonly carts: CartsService;
   // orders: OrdersResource;
 
   constructor(config: ZoeyClientConfig) {
     const validConfig = ZoeyClient.validateConfig(config);
     this.client = new Client(validConfig);
     this.accounts = new AccountsService(this.client);
+    this.carts = new CartsService(this.client);
     // this.orders = new OrdersResource(this.client)
   }
 
