@@ -55,6 +55,7 @@ export type MakePaginatedRequestFunction = <
     schema: Tschema;
     limit?: number;
     maxPages?: number;
+    isMap?: boolean;
   }
 ) => AsyncResult<z.infer<Tschema>, ZoeyError>;
 

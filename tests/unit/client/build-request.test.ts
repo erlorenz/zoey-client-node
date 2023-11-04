@@ -1,5 +1,8 @@
 import { assert, test, describe } from "vitest";
-import { buildRequest } from "../../../src/http-client/build-request.js";
+import {
+  buildParamString,
+  buildRequest,
+} from "../../../src/http-client/build-request.js";
 import type { ZoeyClientConfig } from "../../../src/index.js";
 import { createOAuth } from "../../../src/http-client/oauth.js";
 import type { MakeRequestOptions } from "../../../src/http-client/types.js";
@@ -75,7 +78,7 @@ describe("the build-request function", () => {
     test("adds the query params correctly", () => {
       assert.strictEqual(
         req.url,
-        "https://www.test.com/api/rest/accounts?limit=15&created_at%5Bgt%5D=some+datetime"
+        "https://www.test.com/api/rest/accounts?limit=15&created_at[gt]=some%20datetime"
       );
 
       const url = new URL(req.url);
@@ -84,6 +87,42 @@ describe("the build-request function", () => {
       assert.isTrue(url.searchParams.has("limit", "15"));
       assert.isTrue(url.searchParams.has("created_at[gt]", "some datetime"));
       assert.isFalse(url.searchParams.has("random_other_param"));
+    });
+  });
+
+  describe("a GET with array params", () => {
+    const opts: MakeRequestOptions = {
+      path: "/products",
+      queryParams: {
+        limit: "100",
+        "filter[0][attribute]": "sample_approved",
+        "filter[0][eq]": "1",
+      },
+    };
+
+    const req = buildRequest({
+      opts,
+      auth,
+      oauth,
+      baseUrl,
+      defaultTimeout,
+    });
+
+    test("adds the query params correctly", () => {
+      assert.strictEqual(
+        req.url,
+        "https://www.test.com/api/rest/products?limit=100&filter[0][attribute]=sample_approved&filter[0][eq]=1"
+      );
+
+      const url = new URL(req.url);
+      assert.strictEqual(url.host, "www.test.com");
+      assert.strictEqual(url.pathname, "/api/rest/products");
+      assert.isTrue(url.searchParams.has("limit", "100"));
+      assert.isTrue(
+        url.searchParams.has("filter[0][attribute]", "sample_approved")
+      );
+      assert.isTrue(url.searchParams.has("filter[0][eq]", "1"));
+      assert.isFalse(url.searchParams.has("random_param"));
     });
   });
 
@@ -119,5 +158,20 @@ describe("the build-request function", () => {
     test("contains a body", () => {
       assert.exists(req.body);
     });
+  });
+});
+
+describe("buildParamString function", () => {
+  test("it builds params into a string", () => {
+    const params = {
+      limit: "1",
+      "filter[0][attribute]": "sample_approved",
+      "filter[0][eq]": "1",
+    };
+    const want = "limit=1&filter[0][attribute]=sample_approved&filter[0][eq]=1";
+
+    const got = buildParamString(params);
+
+    assert.strictEqual(got, want);
   });
 });

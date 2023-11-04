@@ -4,11 +4,13 @@ import { ZoeyError } from "../errors/zoey-error.js";
 import { AccountsService } from "../resources/accounts/accounts-service.js";
 import { z } from "zod";
 import { CartsService } from "../resources/carts/carts-service.js";
+import { ProductsService } from "../resources/products/products-service.js";
 
 export class ZoeyClient {
   readonly client: HttpClient;
   readonly accounts: AccountsService;
   readonly carts: CartsService;
+  readonly products: ProductsService;
   // orders: OrdersResource;
 
   constructor(config: ZoeyClientConfig) {
@@ -16,6 +18,7 @@ export class ZoeyClient {
     this.client = new Client(validConfig);
     this.accounts = new AccountsService(this.client);
     this.carts = new CartsService(this.client);
+    this.products = new ProductsService(this.client);
     // this.orders = new OrdersResource(this.client)
   }
 

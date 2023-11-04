@@ -1,6 +1,6 @@
 import type { MakeRequestOptions } from "./types.js";
 import OAuth from "oauth-1.0a";
-import type { ZoeyClientConfig } from "../index.js";
+import type { ZoeyClientConfig, ZoeyQueryParams } from "../index.js";
 
 export function buildRequest({
   opts: { path, method = "GET", queryParams, body, timeout },
@@ -19,7 +19,9 @@ export function buildRequest({
   const selectedTimeout = timeout || defaultTimeout;
 
   if (queryParams) {
-    const paramsString = new URLSearchParams(queryParams).toString();
+    // The URLSearchParams constructor encodes but we need the unencoded for oauth signature
+    const paramsString = buildParamString(queryParams);
+
     url.search = paramsString;
   }
 
@@ -56,4 +58,11 @@ export function buildRequest({
   };
 
   return new Request(url.toString(), options);
+}
+
+export function buildParamString(queryParams: ZoeyQueryParams): string {
+  const entries = Object.entries(queryParams);
+  const formatted = entries.map((entry) => entry.join("=")).join("&");
+
+  return formatted;
 }

@@ -18,6 +18,7 @@ export type {
 
 // Models
 export type { ZoeyAccount } from "./models/account.js";
+export type { ZoeyProduct } from "./models/product.js";
 
 // RequestBodies
 export type * from "./resources/accounts/accounts-request.js";
